@@ -2,8 +2,20 @@ import Header from "./components/Header"
 import "./App.css"
 import { useState, useEffect } from "react"
 
-function PastTraningMenu({ traningMenu, editTraningHistory }) {
-  const menuList = traningMenu.map((item) => {
+interface TrainingItem {
+  date: string
+  fukkin: number
+  udetate: number
+  squat: number
+}
+
+interface PastTraningMenuProps {
+  traningMenu: TrainingItem[]
+  editTraningHistory: (date: string) => void
+}
+
+function PastTraningMenu({ traningMenu, editTraningHistory }: PastTraningMenuProps) {
+  const menuList = traningMenu.map((item: TrainingItem) => {
     return (
       <li key={item.date} className="past-traning-item">
         <p className="past-traning-date">Date: {item.date}</p>
@@ -41,7 +53,18 @@ function PastTraningMenu({ traningMenu, editTraningHistory }) {
   )
 }
 
-function TraningInputForm({ ...props }) {
+interface TraningInputFormProps {
+  fukkin: number
+  udetate: number
+  squat: number
+  isEdit: boolean
+  addTraningHIstory: (e: React.FormEvent<HTMLFormElement>) => void
+  handleChangeFukkin: (e: React.ChangeEvent<HTMLInputElement>) => void
+  handleChangeUdetate: (e: React.ChangeEvent<HTMLInputElement>) => void
+  handleChangeSquat: (e: React.ChangeEvent<HTMLInputElement>) => void
+}
+
+function TraningInputForm({ ...props }: TraningInputFormProps) {
   return (
     <div className="input-form">
       <h3>今日のトレーニングを登録</h3>
@@ -70,7 +93,7 @@ function App() {
   const [udetate, setUdetate] = useState(0)
   const [squat, setSquat] = useState(0)
   const [isEdit, setIsEdit] = useState(false)
-  const [traningHistory, setTraningHistory] = useState(() => {
+  const [traningHistory, setTraningHistory] = useState<TrainingItem[]>(() => {
     const saved = localStorage.getItem("traningHistory")
     return saved ? JSON.parse(saved) : []
   })
@@ -80,7 +103,7 @@ function App() {
   }, [traningHistory])
   const [errorMessage, setErrorMessage] = useState("")
 
-  const addTraningHIstory = (e) => {
+  const addTraningHIstory = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (fukkin < 0 || udetate < 0 || squat < 0) {
       setErrorMessage("数値を正しく入力してください。")
@@ -88,13 +111,13 @@ function App() {
     }
     const date = new Date().toISOString().split("T")[0]
 
-    if (traningHistory.some((item) => item.date === date) && !isEdit) {
+    if (traningHistory.some((item: TrainingItem) => item.date === date) && !isEdit) {
       setErrorMessage("既に登録されています。")
       return
     }
 
     if (isEdit) {
-      setTraningHistory(traningHistory.map(item => {
+      setTraningHistory(traningHistory.map((item: TrainingItem) => {
         return item.date === date ? { ...item, fukkin, udetate, squat } : item
       }))
       setIsEdit(false)
@@ -112,7 +135,7 @@ function App() {
       squat: squat
     }
 
-    setTraningHistory((traningHistory) => [...traningHistory, newTraning])
+    setTraningHistory((traningHistory: TrainingItem[]) => [...traningHistory, newTraning])
     setErrorMessage("")
     setFukkin(0)
     setUdetate(0)
@@ -129,8 +152,8 @@ function App() {
     setSquat(Number(e.target.value))
   }
 
-  const editTraningHistory = (date) => {
-    const editTraning = traningHistory.find(item => item.date === date)
+  const editTraningHistory = (date: string) => {
+    const editTraning = traningHistory.find((item: TrainingItem) => item.date === date)
     if (!editTraning) {
       setErrorMessage("編集対象が見つかりません")
       return
