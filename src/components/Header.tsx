@@ -1,8 +1,8 @@
 function Header() {
     return (
-        <div>
+        <header>
             <h1>筋トレ習慣アプリ</h1>
-        </div>
+        </header>
     )
 }
 

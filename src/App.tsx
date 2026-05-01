@@ -1,188 +1,48 @@
 import Header from "./components/Header"
+import PastTrainingMenu from "./components/PastTrainingMenu"
+import TrainingInputForm from "./components/TrainingInputForm"
 import "./App.css"
-import { useState, useEffect } from "react"
+import { useTraining } from "./utlity"
 
-interface TrainingItem {
-  date: string
-  fukkin: number
-  udetate: number
-  squat: number
-}
-
-interface PastTraningMenuProps {
-  traningMenu: TrainingItem[]
-  editTraningHistory: (date: string) => void
-}
-
-function PastTraningMenu({ traningMenu, editTraningHistory }: PastTraningMenuProps) {
-  const menuList = traningMenu.map((item: TrainingItem) => {
+function JissekiKanri() {
+  const jissekis = Array(28).fill(null).map((_, i) => {
     return (
-      <li key={item.date} className="past-traning-item">
-        <p className="past-traning-date">Date: {item.date}</p>
-        <table className="past-traning-table">
-          <tbody>
-            <tr>
-              <th>種目</th>
-              <th>回数</th>
-            </tr>
-            <tr>
-              <td>腕立て伏せ</td>
-              <td>{item.udetate} 回</td>
-            </tr>
-            <tr>
-              <td>腹筋</td>
-              <td>{item.fukkin} 回</td>
-            </tr>
-            <tr>
-              <td>スクワット</td>
-              <td>{item.squat} 回</td>
-            </tr>
-          </tbody>
-        </table>
-        <button onClick={() => editTraningHistory(item.date)}>編集</button>
-      </li>
+      <div key={i} className="weekly-jisseki">
+        <div className="dayly-jisseki jisseki-10"></div>
+        <div className="dayly-jisseki jisseki-20"></div>
+        <div className="dayly-jisseki jisseki-30"></div>
+        <div className="dayly-jisseki jisseki-40"></div>
+        <div className="dayly-jisseki jisseki-50"></div>
+        <div className="dayly-jisseki jisseki-60"></div>
+        <div className="dayly-jisseki jisseki-70"></div>
+      </div>
     )
   })
   return (
-    <>
-      <h3 className="past-traning-title">過去の履歴</h3>
-      <ul className="past-traning-menu">
-        {menuList}
-      </ul>
-    </>
-  )
-}
-
-interface TraningInputFormProps {
-  fukkin: number
-  udetate: number
-  squat: number
-  isEdit: boolean
-  addTraningHIstory: (e: React.FormEvent<HTMLFormElement>) => void
-  handleChangeFukkin: (e: React.ChangeEvent<HTMLInputElement>) => void
-  handleChangeUdetate: (e: React.ChangeEvent<HTMLInputElement>) => void
-  handleChangeSquat: (e: React.ChangeEvent<HTMLInputElement>) => void
-}
-
-function TraningInputForm({ ...props }: TraningInputFormProps) {
-  return (
-    <div className="input-form">
-      <h3>今日のトレーニングを登録</h3>
-      {props.isEdit ? <p>編集モード</p> : ""}
-      <form onSubmit={props.addTraningHIstory}>
-        <div className="form-control">
-          <label htmlFor="udetate">腕立て伏せ：</label>
-          <input type="number" name="udetate" id="udetate" onChange={props.handleChangeUdetate} value={props.udetate} />
-        </div>
-        <div className="form-control">
-          <label htmlFor="fukkin">腹筋：</label>
-          <input type="number" name="fukkin" id="fukkin" onChange={props.handleChangeFukkin} value={props.fukkin} />
-        </div>
-        <div className="form-control">
-          <label htmlFor="squat">スクワット：</label>
-          <input type="number" name="squat" id="squat" onChange={props.handleChangeSquat} value={props.squat} />
-        </div>
-        <button type="submit">登録</button>
-      </form>
+    <div className="grid-jisseki-wrapper">
+      {jissekis}
     </div>
   )
 }
 
 function App() {
-  const [fukkin, setFukkin] = useState(0)
-  const [udetate, setUdetate] = useState(0)
-  const [squat, setSquat] = useState(0)
-  const [isEdit, setIsEdit] = useState(false)
-  const [traningHistory, setTraningHistory] = useState<TrainingItem[]>(() => {
-    const saved = localStorage.getItem("traningHistory")
-    return saved ? JSON.parse(saved) : []
-  })
-
-  useEffect(() => {
-    localStorage.setItem("traningHistory", JSON.stringify(traningHistory))
-  }, [traningHistory])
-  const [errorMessage, setErrorMessage] = useState("")
-
-  const addTraningHIstory = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    if (fukkin < 0 || udetate < 0 || squat < 0) {
-      setErrorMessage("数値を正しく入力してください。")
-      return
-    }
-    const date = new Date().toISOString().split("T")[0]
-
-    if (traningHistory.some((item: TrainingItem) => item.date === date) && !isEdit) {
-      setErrorMessage("既に登録されています。")
-      return
-    }
-
-    if (isEdit) {
-      setTraningHistory(traningHistory.map((item: TrainingItem) => {
-        return item.date === date ? { ...item, fukkin, udetate, squat } : item
-      }))
-      setIsEdit(false)
-      setErrorMessage("")
-      setFukkin(0)
-      setUdetate(0)
-      setSquat(0)
-      return
-    }
-
-    const newTraning = {
-      date: date,
-      fukkin: fukkin,
-      udetate: udetate,
-      squat: squat
-    }
-
-    setTraningHistory((traningHistory: TrainingItem[]) => [...traningHistory, newTraning])
-    setErrorMessage("")
-    setFukkin(0)
-    setUdetate(0)
-    setSquat(0)
-  }
-
-  const handleChangeFukkin = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFukkin(Number(e.target.value))
-  }
-  const handleChangeUdetate = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUdetate(Number(e.target.value))
-  }
-  const handleChangeSquat = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSquat(Number(e.target.value))
-  }
-
-  const editTraningHistory = (date: string) => {
-    const editTraning = traningHistory.find((item: TrainingItem) => item.date === date)
-    if (!editTraning) {
-      setErrorMessage("編集対象が見つかりません")
-      return
-    }
-    setErrorMessage("")
-    setFukkin(editTraning.fukkin)
-    setUdetate(editTraning.udetate)
-    setSquat(editTraning.squat)
-    setIsEdit(true)
-  }
+  const { formData, isEdit, trainingHistory, errorMessage, addTrainingHistory, handleChangeForm, editTrainingHistory } = useTraining()
 
   return (
-    <div>
+    <div className="container">
       <Header />
-      <div className="past-traning-view">
+      <div className="past-training-view">
         {errorMessage && <p className="error-message">{errorMessage}</p>}
-        <TraningInputForm
-          fukkin={fukkin}
-          udetate={udetate}
-          squat={squat}
-          addTraningHIstory={addTraningHIstory}
-          handleChangeFukkin={handleChangeFukkin}
-          handleChangeUdetate={handleChangeUdetate}
-          handleChangeSquat={handleChangeSquat}
+        <TrainingInputForm
+          formData={formData}
+          addTrainingHistory={addTrainingHistory}
+          handleChangeForm={handleChangeForm}
           isEdit={isEdit}
         />
-        <PastTraningMenu
-          traningMenu={traningHistory}
-          editTraningHistory={editTraningHistory}
+        <JissekiKanri />
+        <PastTrainingMenu
+          trainingMenu={trainingHistory}
+          editTrainingHistory={editTrainingHistory}
         />
       </div>
     </div>
