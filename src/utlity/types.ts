@@ -1,8 +1,8 @@
 export interface TrainingItem {
     date: string
-    fukkin: number
-    udetate: number
-    squat: number
+    fukkin: number | null
+    udetate: number | null
+    squat: number | null
 }
 
 export interface PastTrainingMenuProps {

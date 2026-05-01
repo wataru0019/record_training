@@ -21,13 +21,13 @@ export function useTraining() {
 
     const addTrainingHistory = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        if (formData.fukkin < 0 || formData.udetate < 0 || formData.squat < 0) {
-            setErrorMessage("数値を正しく入力してください。")
+        if (formData.fukkin === null || formData.udetate === null || formData.squat === null) {
+            setErrorMessage("数値を入力してください。")
             return
         }
 
-        if (formData.fukkin === null || formData.udetate === null || formData.squat === null) {
-            setErrorMessage("数値を入力してください。")
+        if (formData.fukkin < 0 || formData.udetate < 0 || formData.squat < 0) {
+            setErrorMessage("数値を正しく入力してください。")
             return
         }
 
